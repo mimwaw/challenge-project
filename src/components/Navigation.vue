@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     fetchUsername() {
-      api.get("/user").then((res) => {
+      api.get("/user").then(res => {
         this.username = res.data.user.username;
       });
     }
@@ -38,6 +38,7 @@ export default {
 <style lang="scss" scoped>
 .nav {
   background-color: #373a3c;
+  width: 100%;
   height: 60px;
   color: white;
   padding: 10px 0;
