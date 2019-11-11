@@ -32,10 +32,19 @@
                 >...</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                   <a class="dropdown-item" href="#">Edit</a>
-                  <a class="dropdown-item" href="#">Delete</a>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-toggle="modal"
+                    :data-target="`#${article.slug}`"
+                  >Delete</a>
                 </div>
               </div>
             </td>
+            <Modal title="Delete Article" :id="article.slug" @modalConfirm="modalConfirm(article.slug)">
+              Are you sure
+              to delete Article?
+            </Modal>
           </tr>
         </tbody>
       </table>
@@ -64,6 +73,7 @@
         </nav>
       </div>
       <Loading :isShow="getArticlesStatus == 'loading'" />
+      <Toast :type="toast.type" :isShow="toast.visible">{{ toast.text }}</Toast>
     </div>
   </Layout>
 </template>
@@ -71,13 +81,21 @@
 <script>
 import Layout from '../layouts/Layout';
 import Loading from '../components/Loading';
+import Modal from '../components/Modal';
+import Toast from '../components/Toast';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
   data() {
     return {
       articles: [],
-      offset: ''
+      offset: '',
+      articleToDelete: '',
+      toast: {
+        type: '',
+        visible: false,
+        text: '',
+      },
     };
   },
   created() {
@@ -86,6 +104,7 @@ export default {
   methods: {
     ...mapActions({
       fetchArticles: 'articles/FETCH_ARTICLES_REQ',
+      deleteArticle: 'articles/DELETE_ARTICLES',
     }),
     fetchArticlesAgain: function() {
       this.offset = ((this.$route.params.page || 1) - 1) * 10;
@@ -95,6 +114,21 @@ export default {
       }).then(() => {
         this.articles = this.getArticles;
       });
+    },
+    modalConfirm: function(slug) {
+      // console.log(this.articleToDelete);
+      this.deleteArticle(slug)
+        .then((res) => {
+          this.toast.type = 'success';
+          this.toast.text = 'Article deleted successfuly';
+          this.toast.visible = true;
+          console.log(res);
+        })
+        .catch(error => {
+          this.toast.type = 'error';
+          this.toast.text = 'Failed to delete the article.';
+          this.toast.visible = true;
+        });
     },
   },
   computed: {
@@ -114,10 +148,20 @@ export default {
         behavior: 'smooth',
       });
     },
+    'toast.visible': function() {
+      this.fetchArticlesAgain();
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
+    }
   },
   components: {
     Layout,
     Loading,
+    Modal,
+    Toast,
   },
   filters: {
     formatDate: function(isoDate) {
