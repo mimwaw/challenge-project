@@ -49,28 +49,7 @@
         </tbody>
       </table>
       <div class="row justify-content-center" v-if="getArticlesStatus != 'loading'">
-        <nav aria-label="Page navigation example">
-          <ul class="pagination">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Previous</span>
-              </a>
-            </li>
-            <li class="page-item" v-for="(page, i) in getArticlesPages" :key="i">
-              <router-link
-                class="page-link"
-                :to="i+1 == 1 ? `/articles` : `/articles/page/${i+1}`"
-              >{{ i + 1 }}</router-link>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Next</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+        <Pagination :totalPages="getArticlesPages" :visiblePages="5" :currentPage="Number.parseInt($route.params.page) || 1" />
       </div>
       <Loading :isShow="getArticlesStatus == 'loading'" />
       <Toast :type="toast.type" :isShow="toast.visible" :closeToast="this.hideDeletedToast">{{ toast.text }}</Toast>
@@ -86,6 +65,7 @@ import Layout from '../layouts/Layout';
 import Loading from '../components/Loading';
 import Modal from '../components/Modal';
 import Toast from '../components/Toast';
+import Pagination from '../components/Pagination';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
@@ -99,13 +79,14 @@ export default {
         visible: false,
         text: '',
         createdToast: this.$route.params.created || ''
-      },
+      }
     };
   },
   created() {
     this.fetchArticlesAgain();
-    console.log(this.$route);
-    console.log(this.toast.createdToast);
+    if(this.$route.params.page > this.getArticlesPages) {
+      console.log('siktir');
+    }
   },
   methods: {
     ...mapActions({
@@ -174,6 +155,7 @@ export default {
     Loading,
     Modal,
     Toast,
+    Pagination
   },
   filters: {
     formatDate: function(isoDate) {
