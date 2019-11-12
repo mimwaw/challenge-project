@@ -11,12 +11,25 @@ export const articles = {
     // Delete States
     deleteStatus: '',
     deleteError: '',
+
+    // Create States
+    createStatus: '',
+    createError: '',
+
+    // Tags
+    articleTags: [],
+    tagsStatus: '',
+    tagsError: ''
   },
   getters: {
     getArticles: state => state.articles,
     getArticleStatus: state => state.fetchStatus,
     getArticleError: state => state.error,
     getArticlesPages: state => state.articlesPages,
+    getCreateStatus: state => state.createStatus,
+    getCreateError: state => state.createError,
+    getTagsStatus: state => state.tagsStatus,
+    getTags: state => state.articleTags
   },
   mutations: {
     ARTICLES_REQ: state => {
@@ -45,6 +58,31 @@ export const articles = {
       state.deleteStatus = 'error';
       state.deleteError = error;
     },
+
+    // Create New Article
+    CREATE_ARTICLE_REQ: state => {
+      state.createStatus = 'loading';
+    },
+    CREATE_ARTICLE_SUCCESS: state => {
+      state.createStatus = 'success';
+    },
+    CREATE_ARTICLE_ERROR: (state, error) => {
+      state.createStatus = 'error';
+      state.createError = error;
+    },
+
+    // Get Tags
+    FETCH_TAGS_REQ: state => {
+      state.tagsStatus = 'loading'; 
+    },
+    FETCH_TAGS_SUCCESS: (state, tags) => {
+      state.tagsStatus = 'success';
+      state.articleTags = tags;
+    },
+    FETCH_TAGS_ERROR: (state, error) => {
+      state.tagsStatus = 'error';
+      state.tagsError = error;
+    }
   },
   actions: {
     FETCH_ARTICLES_REQ: (
@@ -95,5 +133,39 @@ export const articles = {
           });
       });
     },
+    CREATE_ARTICLE: ({ commit }, { title, desc, body, tags }) => {
+      return new Promise((resolve, reject) => {
+        commit('CREATE_ARTICLE_REQ');
+        api
+          .post('/articles', {
+            article: {
+              title: title,
+              description: desc,
+              body: body,
+              tagList: tags,
+            },
+          })
+          .then(res => {
+            commit('CREATE_ARTICLE_SUCCESS');
+            resolve(res);
+          })
+          .catch(err => {
+            commit('CREATE_ARTICLE_ERROR', err);
+            reject(err);
+          });
+      });
+    },
+    FETCH_TAGS: ({ commit }) => {
+      return new Promise((resolve, reject) => {
+        commit('FETCH_TAGS_REQ');
+        api.get('/tags').then(res =>{
+          commit('FETCH_TAGS_SUCCESS', res.data.tags.sort());
+          resolve(res);
+        }).catch(err => {
+          commit('FETCH_TAGS_ERROR', err);
+          reject(err);
+        });
+      });
+    }
   },
 };
