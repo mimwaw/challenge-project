@@ -18,7 +18,7 @@
             <td>{{ article.title }}</td>
             <td>{{ article.author.username }}</td>
             <td>{{ article.tagList.join(", ") }}</td>
-            <td>{{ article.body }}</td>
+            <td>{{ article.body | formatBody }}</td>
             <td>{{ article.createdAt | formatDate }}</td>
             <td>
               <div class="dropdown">
@@ -73,7 +73,10 @@
         </nav>
       </div>
       <Loading :isShow="getArticlesStatus == 'loading'" />
-      <Toast :type="toast.type" :isShow="toast.visible">{{ toast.text }}</Toast>
+      <Toast :type="toast.type" :isShow="toast.visible" :closeToast="this.hideDeletedToast">{{ toast.text }}</Toast>
+      <Toast type="success" :isShow="toast.createdToast == true" :closeToast="this.hideCreatedToast">
+        <b>Well done!</b> Article created successfuly
+      </Toast>
     </div>
   </Layout>
 </template>
@@ -95,11 +98,14 @@ export default {
         type: '',
         visible: false,
         text: '',
+        createdToast: this.$route.params.created || ''
       },
     };
   },
   created() {
     this.fetchArticlesAgain();
+    console.log(this.$route);
+    console.log(this.toast.createdToast);
   },
   methods: {
     ...mapActions({
@@ -130,6 +136,12 @@ export default {
           this.toast.visible = true;
         });
     },
+    hideDeletedToast: function() {
+      this.toast.visible = false;
+    },
+    hideCreatedToast: function() {
+      this.toast.createdToast = false;
+    }
   },
   computed: {
     ...mapGetters({
@@ -148,7 +160,7 @@ export default {
         behavior: 'smooth',
       });
     },
-    'toast.visible': function() {
+    'toast.type': function() {
       this.fetchArticlesAgain();
       window.scrollTo({
         top: 0,
@@ -184,6 +196,9 @@ export default {
         monthNames[date.getMonth()]
       } ${date.getDate()} ,${date.getFullYear()}`;
     },
+    formatBody: function(body) {
+      return body.split(' ').slice(0, 20).join(' ');
+    }
   },
 };
 </script>
