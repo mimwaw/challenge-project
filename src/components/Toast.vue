@@ -25,12 +25,12 @@
 export default {
   data() {
     return {
-      toggle: this.isShow
     }
   },
   props: {
     type: String,
     isShow: Boolean,
+    closeToast: Function
   }
 };
 </script>

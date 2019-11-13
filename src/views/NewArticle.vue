@@ -1,6 +1,5 @@
 <template>
   <Layout>
-    {{ $route.params.created }}
     <h2>New Article</h2>
     <form @submit.prevent="submit">
       <div class="row">
@@ -86,6 +85,9 @@ import { required } from 'vuelidate/lib/validators';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+  metaInfo: {
+    title: 'Create Article'
+  },
   data() {
     return {
       title: '',
