@@ -126,7 +126,7 @@ export default {
   created() {
     this.fetchArticlesAgain();
     if (this.$route.params.page > this.getArticlesPages) {
-      console.log('siktir');
+      this.$router.push('/404');
     }
   },
   methods: {
