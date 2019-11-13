@@ -2,7 +2,10 @@
   <Layout>
     <div class="wrapper">
       <h2>All Posts</h2>
-      <table class="table" v-if="getArticlesStatus != 'loading'">
+      <table
+        class="table table-responsive"
+        v-if="getArticlesStatus != 'loading' && articles.length > 0"
+      >
         <thead>
           <th>#</th>
           <th>Title</th>
@@ -17,7 +20,7 @@
             <td>{{ offset + i + 1 }}</td>
             <td>{{ article.title }}</td>
             <td>{{ article.author.username }}</td>
-            <td>{{ article.tagList.join(", ") }}</td>
+            <td>{{ article.tagList.join(', ') }}</td>
             <td>{{ article.body | formatBody }}</td>
             <td>{{ article.createdAt | formatDate }}</td>
             <td>
@@ -29,32 +32,66 @@
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
-                >...</button>
+                >
+                  ...
+                </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a class="dropdown-item" href="#">Edit</a>
+                  <router-link class="dropdown-item" :to="`/articles/edit/${article.slug}`">Edit</router-link>
                   <a
                     class="dropdown-item"
                     href="#"
                     data-toggle="modal"
                     :data-target="`#${article.slug}`"
-                  >Delete</a>
+                    >Delete</a
+                  >
                 </div>
               </div>
             </td>
-            <Modal title="Delete Article" :id="article.slug" @modalConfirm="modalConfirm(article.slug)">
-              Are you sure
-              to delete Article?
+            <Modal
+              title="Delete Article"
+              :id="article.slug"
+              @modalConfirm="modalConfirm(article.slug)"
+            >
+              Are you sure to delete Article?
             </Modal>
           </tr>
         </tbody>
       </table>
-      <div class="row justify-content-center" v-if="getArticlesStatus != 'loading'">
-        <Pagination :totalPages="getArticlesPages" :visiblePages="5" :currentPage="Number.parseInt($route.params.page) || 1" />
+      <div v-if="getArticlesStatus != 'loading' && articles.length == 0">
+        <div class="row justify-content-center">
+          There is no post here yet.
+        </div>
+      </div>
+      <div
+        class="row justify-content-center"
+        v-if="getArticlesStatus != 'loading' && articles.length > 0"
+      >
+        <Pagination
+          :totalPages="getArticlesPages"
+          :visiblePages="5"
+          :currentPage="Number.parseInt($route.params.page) || 1"
+        />
       </div>
       <Loading :isShow="getArticlesStatus == 'loading'" />
-      <Toast :type="toast.type" :isShow="toast.visible" :closeToast="this.hideDeletedToast">{{ toast.text }}</Toast>
-      <Toast type="success" :isShow="toast.createdToast == true" :closeToast="this.hideCreatedToast">
+      <Toast
+        :type="toast.type"
+        :isShow="toast.visible"
+        @close="hideDeletedToast"
+        >{{ toast.text }}</Toast
+      >
+      <Toast
+        type="success"
+        :isShow="toast.createdToast == true"
+        @close="hideCreatedToast"
+      >
         <b>Well done!</b> Article created successfuly
+      </Toast>
+      <Toast
+        type="success"
+        :isShow="toast.updatedToast == true"
+        @close="hideUpdatedToast"
+      >
+        <b>Well done!</b> Article updated successfuly
       </Toast>
     </div>
   </Layout>
@@ -69,6 +106,9 @@ import Pagination from '../components/Pagination';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
+  metaInfo: {
+    title: 'Articles'
+  },
   data() {
     return {
       articles: [],
@@ -78,13 +118,14 @@ export default {
         type: '',
         visible: false,
         text: '',
-        createdToast: this.$route.params.created || ''
-      }
+        createdToast: this.$route.params.created || '',
+        updatedToast: this.$route.params.updated || ''
+      },
     };
   },
   created() {
     this.fetchArticlesAgain();
-    if(this.$route.params.page > this.getArticlesPages) {
+    if (this.$route.params.page > this.getArticlesPages) {
       console.log('siktir');
     }
   },
@@ -105,11 +146,10 @@ export default {
     modalConfirm: function(slug) {
       // console.log(this.articleToDelete);
       this.deleteArticle(slug)
-        .then((res) => {
+        .then(res => {
           this.toast.type = 'success';
           this.toast.text = 'Article deleted successfuly';
           this.toast.visible = true;
-          console.log(res);
         })
         .catch(error => {
           this.toast.type = 'error';
@@ -122,6 +162,9 @@ export default {
     },
     hideCreatedToast: function() {
       this.toast.createdToast = false;
+    },
+    hideUpdatedToast: function() {
+      this.toast.updatedToast = false;
     }
   },
   computed: {
@@ -148,14 +191,14 @@ export default {
         left: 0,
         behavior: 'smooth',
       });
-    }
+    },
   },
   components: {
     Layout,
     Loading,
     Modal,
     Toast,
-    Pagination
+    Pagination,
   },
   filters: {
     formatDate: function(isoDate) {
@@ -179,8 +222,11 @@ export default {
       } ${date.getDate()} ,${date.getFullYear()}`;
     },
     formatBody: function(body) {
-      return body.split(' ').slice(0, 20).join(' ');
-    }
+      return body
+        .split(' ')
+        .slice(0, 20)
+        .join(' ');
+    },
   },
 };
 </script>

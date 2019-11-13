@@ -2,13 +2,13 @@
   <div class="nav">
     <div class="container-fluid">
       <div class="row align-items-center">
-        <div class="col-lg-2">
+        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
           <h4>Arvan Challenge</h4>
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-2 col-md-3 col-sm-4 col-4">
           <span>Welcome, {{ username }}</span>
         </div>
-        <div class="col-lg-1 ml-auto">
+        <div class="col-lg-1 col-md-2 col-sm-2 col-2 ml-auto">
           <button
             type="button"
             class="btn btn-outline-info"
