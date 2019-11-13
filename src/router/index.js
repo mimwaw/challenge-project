@@ -48,10 +48,10 @@ const routes = [
         path: 'edit/:slug',
         component: EditArticle,
       },
-      { path: '/404', component: NotFound },
-      { path: '*', redirect: '/404' },
     ],
   },
+  { path: '/404', component: NotFound },
+  { path: '*', redirect: '/404' },
 ];
 
 const router = new VueRouter({
