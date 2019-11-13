@@ -1,8 +1,10 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Login from '../views/Login.vue';
+import Register from '../views/Register.vue';
 import Articles from '../views/Articles.vue';
 import NewArticle from '../views/NewArticle.vue';
+import EditArticle from '../views/EditArticle.vue';
 import ArticleParent from '../views/ArticleParent.vue';
 import store from '../store/index';
 
@@ -10,8 +12,16 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: '/',
+    redirect: '/articles'
+  },
+  {
     path: '/login',
     component: Login,
+  },
+  {
+    path: '/register',
+    component: Register
   },
   {
     path: '/articles',
@@ -23,7 +33,7 @@ const routes = [
       {
         name: 'Articles',
         path: '',
-        component: Articles
+        component: Articles,
       },
       {
         path: 'create',
@@ -33,6 +43,10 @@ const routes = [
         path: 'page/:page',
         component: Articles,
       },
+      {
+        path: 'edit/:slug',
+        component: EditArticle
+      }
     ],
   },
 ];

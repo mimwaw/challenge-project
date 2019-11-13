@@ -19,7 +19,11 @@ export const articles = {
     // Tags
     articleTags: [],
     tagsStatus: '',
-    tagsError: ''
+    tagsError: '',
+
+    // Edit Article
+    updateArticleStatus: '',
+    updateArticleError: '',
   },
   getters: {
     getArticles: state => state.articles,
@@ -29,7 +33,8 @@ export const articles = {
     getCreateStatus: state => state.createStatus,
     getCreateError: state => state.createError,
     getTagsStatus: state => state.tagsStatus,
-    getTags: state => state.articleTags
+    getTags: state => state.articleTags,
+    getUpdateStatus: state => state.updateArticleStatus
   },
   mutations: {
     ARTICLES_REQ: state => {
@@ -73,7 +78,7 @@ export const articles = {
 
     // Get Tags
     FETCH_TAGS_REQ: state => {
-      state.tagsStatus = 'loading'; 
+      state.tagsStatus = 'loading';
     },
     FETCH_TAGS_SUCCESS: (state, tags) => {
       state.tagsStatus = 'success';
@@ -82,7 +87,19 @@ export const articles = {
     FETCH_TAGS_ERROR: (state, error) => {
       state.tagsStatus = 'error';
       state.tagsError = error;
-    }
+    },
+
+    // Update Article
+    UPDATE_ARTICLE_REQ: state => {
+      state.updateArticleStatus = 'loading';
+    },
+    UPDATE_ARTICLE_SUCCESS: state => {
+      state.updateArticleStatus = 'success';
+    },
+    UPDATE_ARTICLE_ERROR: (state, error) => {
+      state.updateArticleStatus = 'error';
+      state.updateArticleError = error;
+    },
   },
   actions: {
     FETCH_ARTICLES_REQ: (
@@ -158,14 +175,40 @@ export const articles = {
     FETCH_TAGS: ({ commit }) => {
       return new Promise((resolve, reject) => {
         commit('FETCH_TAGS_REQ');
-        api.get('/tags').then(res =>{
-          commit('FETCH_TAGS_SUCCESS', res.data.tags.sort());
-          resolve(res);
-        }).catch(err => {
-          commit('FETCH_TAGS_ERROR', err);
-          reject(err);
-        });
+        api
+          .get('/tags')
+          .then(res => {
+            commit('FETCH_TAGS_SUCCESS', res.data.tags.sort());
+            resolve(res);
+          })
+          .catch(err => {
+            commit('FETCH_TAGS_ERROR', err);
+            reject(err);
+          });
       });
-    }
+    },
+    UPDATE_ARTICLE: ({ commit }, { slug, title, desc, body, tags }) => {
+      return new Promise((resolve, reject) => {
+        commit('UPDATE_ARTICLE_REQ');
+        api
+          .put(`/articles/${slug}`,{
+            article: {
+              title: title,
+              description: desc,
+              body: body,
+              tagList: tags
+            }
+          })
+          .then(res => {
+            commit('UPDATE_ARTICLE_SUCCESS');
+            resolve(res);
+          })
+          .catch(err => {
+            const error = res.response.data;
+            commit('UPDATE_ARTICLE_ERROR', error);
+            reject(err);
+          });
+      });
+    },
   },
 };
