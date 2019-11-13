@@ -6,6 +6,7 @@ import Articles from '../views/Articles.vue';
 import NewArticle from '../views/NewArticle.vue';
 import EditArticle from '../views/EditArticle.vue';
 import ArticleParent from '../views/ArticleParent.vue';
+import NotFound from '../views/NotFound.vue';
 import store from '../store/index';
 
 Vue.use(VueRouter);
@@ -13,7 +14,7 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/',
-    redirect: '/articles'
+    redirect: '/articles',
   },
   {
     path: '/login',
@@ -21,7 +22,7 @@ const routes = [
   },
   {
     path: '/register',
-    component: Register
+    component: Register,
   },
   {
     path: '/articles',
@@ -45,8 +46,10 @@ const routes = [
       },
       {
         path: 'edit/:slug',
-        component: EditArticle
-      }
+        component: EditArticle,
+      },
+      { path: '/404', component: NotFound },
+      { path: '*', redirect: '/404' },
     ],
   },
 ];
